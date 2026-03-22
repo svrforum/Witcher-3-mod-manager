@@ -27,26 +27,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npx electron-vite build
-
-      - name: Package (installer + portable)
-        run: npx electron-builder --win nsis zip
+      - name: Build & Publish
+        run: npx electron-vite build && npx electron-builder --win nsis zip --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-release
-          path: |
-            dist/*.exe
-            dist/*.zip
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/*.exe
-            dist/*.zip
-          generate_release_notes: true
