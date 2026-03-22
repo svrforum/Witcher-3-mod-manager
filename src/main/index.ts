@@ -1,6 +1,7 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
+import { registerIpcHandlers } from './ipc-handlers'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -33,21 +34,7 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  ipcMain.on('window:minimize', () => {
-    mainWindow.minimize()
-  })
-
-  ipcMain.on('window:maximize', () => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize()
-    } else {
-      mainWindow.maximize()
-    }
-  })
-
-  ipcMain.on('window:close', () => {
-    mainWindow.close()
-  })
+  registerIpcHandlers(mainWindow)
 }
 
 app.whenReady().then(() => {
