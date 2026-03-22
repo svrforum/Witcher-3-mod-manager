@@ -2,7 +2,7 @@ import { existsSync, mkdirSync } from 'fs'
 import { extname } from 'path'
 import AdmZip from 'adm-zip'
 
-export function extractArchive(archivePath: string, destDir: string): void {
+export async function extractArchive(archivePath: string, destDir: string): Promise<void> {
   if (!existsSync(destDir)) {
     mkdirSync(destDir, { recursive: true })
   }
@@ -13,16 +13,18 @@ export function extractArchive(archivePath: string, destDir: string): void {
     const zip = new AdmZip(archivePath)
     zip.extractAllTo(destDir, true)
   } else if (ext === '.rar') {
-    // Use node-unrar-js for RAR files
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { createExtractorFromFile } = require('node-unrar-js')
-    const extractor = createExtractorFromFile({ filepath: archivePath, targetPath: destDir })
+    const extractor = await createExtractorFromFile({
+      filepath: archivePath,
+      targetPath: destDir,
+    })
     const extracted = extractor.extract()
-    if (extracted.files.length === 0) {
-      throw new Error('Failed to extract RAR archive')
+    // Consume the generator to trigger extraction
+    const files = [...extracted.files]
+    if (files.length === 0) {
+      throw new Error('Failed to extract RAR archive — no files found')
     }
   } else if (ext === '.7z') {
-    // For .7z files, try system 7z command
     const { execFileSync } = require('child_process')
     try {
       execFileSync('7z', ['x', archivePath, `-o${destDir}`, '-y'], {

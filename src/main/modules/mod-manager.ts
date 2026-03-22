@@ -6,6 +6,7 @@ import {
   readdirSync,
   renameSync,
   rmSync,
+  cpSync,
 } from 'fs'
 import { join, relative, basename } from 'path'
 import { extractArchive } from '../utils/archive'
@@ -149,30 +150,70 @@ export function applyLoadOrder(modsDir: string, order: string[]): void {
  * Find the actual mod folder inside extracted content.
  * Looks for a folder starting with "mod" at the root or one level deep.
  */
-function findModFolder(extractedDir: string): string | null {
-  const entries = readdirSync(extractedDir, { withFileTypes: true })
+/**
+ * Find mod folders in extracted archive. Handles common structures:
+ * 1. Archive contains modXYZ/ directly
+ * 2. Archive contains mods/modXYZ/ (Nexus standard)
+ * 3. Archive contains a wrapper folder with mods/modXYZ/ inside
+ * Returns array of mod folder paths found.
+ */
+function findModFolders(extractedDir: string): string[] {
+  const results: string[] = []
 
-  // Check top-level entries for a mod folder
-  for (const entry of entries) {
-    if (entry.isDirectory() && entry.name.toLowerCase().startsWith('mod')) {
-      return join(extractedDir, entry.name)
-    }
-  }
+  function scanDir(dir: string, depth: number): void {
+    if (depth > 3) return
+    const entries = readdirSync(dir, { withFileTypes: true })
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      const fullPath = join(dir, entry.name)
+      const name = entry.name.toLowerCase()
 
-  // Check one level deep (in case archive has a wrapper folder)
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const subPath = join(extractedDir, entry.name)
-      const subEntries = readdirSync(subPath, { withFileTypes: true })
-      for (const sub of subEntries) {
-        if (sub.isDirectory() && sub.name.toLowerCase().startsWith('mod')) {
-          return join(subPath, sub.name)
+      // "mods" folder — look inside for actual mod folders
+      if (name === 'mods') {
+        const inner = readdirSync(fullPath, { withFileTypes: true })
+        for (const sub of inner) {
+          if (sub.isDirectory() && sub.name.toLowerCase().startsWith('mod')) {
+            results.push(join(fullPath, sub.name))
+          }
         }
+      }
+      // Direct mod folder (starts with "mod" but isn't "mods")
+      else if (name.startsWith('mod') && name !== 'mods') {
+        results.push(fullPath)
+      }
+      // Could be a wrapper folder — check one level deeper
+      else if (depth === 0) {
+        scanDir(fullPath, depth + 1)
       }
     }
   }
 
-  return null
+  scanDir(extractedDir, 0)
+  return results
+}
+
+/**
+ * Find extra folders that should go to game root (e.g., bin/, dlc/).
+ */
+function findGameRootFolders(extractedDir: string): string[] {
+  const gameRootNames = ['bin', 'dlc']
+  const results: string[] = []
+
+  function scanDir(dir: string, depth: number): void {
+    if (depth > 1) return
+    const entries = readdirSync(dir, { withFileTypes: true })
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      if (gameRootNames.includes(entry.name.toLowerCase())) {
+        results.push(join(dir, entry.name))
+      } else if (depth === 0 && entry.name.toLowerCase() !== 'mods') {
+        scanDir(join(dir, entry.name), depth + 1)
+      }
+    }
+  }
+
+  scanDir(extractedDir, 0)
+  return results
 }
 
 export interface InstallResult {
@@ -180,35 +221,51 @@ export interface InstallResult {
   scripts: string[]
 }
 
-export function installMod(archivePath: string, modsDir: string): InstallResult {
-  // Create a temp directory inside modsDir for extraction
+export async function installMod(archivePath: string, modsDir: string, gamePath?: string): Promise<InstallResult> {
   const tempDir = join(modsDir, `__temp_install_${Date.now()}`)
   mkdirSync(tempDir, { recursive: true })
 
   try {
-    extractArchive(archivePath, tempDir)
+    await extractArchive(archivePath, tempDir)
 
-    const modFolder = findModFolder(tempDir)
-    if (!modFolder) {
+    // Find mod folders
+    const modFolders = findModFolders(tempDir)
+    if (modFolders.length === 0) {
       throw new Error('No mod folder found in archive. Expected a folder starting with "mod".')
     }
 
-    const folderName = basename(modFolder)
-    const destPath = join(modsDir, folderName)
+    // Install each mod folder
+    let primaryFolder = ''
+    const allScripts: string[] = []
 
-    if (existsSync(destPath)) {
-      rmSync(destPath, { recursive: true, force: true })
+    for (const modFolder of modFolders) {
+      const folderName = basename(modFolder)
+      const destPath = join(modsDir, folderName)
+
+      if (existsSync(destPath)) {
+        rmSync(destPath, { recursive: true, force: true })
+      }
+
+      cpSync(modFolder, destPath, { recursive: true })
+
+      if (!primaryFolder) primaryFolder = folderName
+      allScripts.push(...scanModScripts(destPath))
     }
 
-    renameSync(modFolder, destPath)
+    // Copy game-root folders (bin/, dlc/) to game directory
+    if (gamePath) {
+      const gameRootFolders = findGameRootFolders(tempDir)
+      for (const folder of gameRootFolders) {
+        const folderName = basename(folder)
+        const destPath = join(gamePath, folderName)
+        cpSync(folder, destPath, { recursive: true })
+      }
+    }
 
-    const scripts = scanModScripts(destPath)
-
-    return { folderName, scripts }
+    return { folderName: primaryFolder, scripts: allScripts }
   } catch (err) {
     throw err
   } finally {
-    // Clean up temp dir
     if (existsSync(tempDir)) {
       rmSync(tempDir, { recursive: true, force: true })
     }

@@ -153,7 +153,7 @@ export function registerIpcHandlers(_mainWindow: BrowserWindow): void {
       const db = getModDatabase(config.gamePath)
 
       const installResult = await modQueue.enqueue(async () => {
-        return installMod(archivePath, modsDir)
+        return installMod(archivePath, modsDir, config.gamePath)
       })
 
       const modEntry: ModEntry = {
