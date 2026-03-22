@@ -10,7 +10,7 @@ export default function SettingsPage(): JSX.Element {
   const config = useAppStore((s) => s.config)
   const setConfig = useAppStore((s) => s.setConfig)
   const addToast = useToastStore((s) => s.addToast)
-  const [apiKey, setApiKey] = useState(config?.nexusApiKey ?? '')
+  const _ = config?.nexusApiKey // unused, kept for config compat
 
   if (!config) return <div className="p-6 text-witcher-text-muted">{t('common.loading')}</div>
 
@@ -38,10 +38,6 @@ export default function SettingsPage(): JSX.Element {
       if (String(e).includes('canceled')) return
       addToast(t('common.error'), 'error')
     }
-  }
-
-  const handleSaveApiKey = async (): Promise<void> => {
-    await saveConfig({ nexusApiKey: apiKey })
   }
 
   const handleLanguageChange = async (lang: 'ko' | 'en'): Promise<void> => {
@@ -79,26 +75,6 @@ export default function SettingsPage(): JSX.Element {
         <span className="text-sm text-witcher-text">
           {config.gameVersion === 'nextgen' ? 'Next-Gen' : 'Classic'}
         </span>
-      </section>
-
-      {/* Nexus API Key */}
-      <section className="bg-witcher-card rounded-lg p-4 mb-4">
-        <h2 className="text-sm font-semibold text-witcher-gold mb-3">{t('settings.nexusApiKey')}</h2>
-        <div className="flex items-center gap-3">
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            className="flex-1 bg-witcher-surface border border-witcher-border rounded px-3 py-1.5 text-sm text-witcher-text focus:border-witcher-gold focus:outline-none transition-colors"
-            placeholder="Enter API key..."
-          />
-          <button
-            onClick={handleSaveApiKey}
-            className="px-3 py-1.5 text-xs bg-witcher-gold text-witcher-bg font-semibold rounded hover:bg-witcher-gold-light transition-colors"
-          >
-            {t('common.save')}
-          </button>
-        </div>
       </section>
 
       {/* Language */}
