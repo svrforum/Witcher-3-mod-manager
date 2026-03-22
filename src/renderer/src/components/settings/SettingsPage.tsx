@@ -34,7 +34,8 @@ export default function SettingsPage(): JSX.Element {
           gameVersion: (result.gameVersion as AppConfig['gameVersion']) || config.gameVersion
         })
       }
-    } catch {
+    } catch (e) {
+      if (String(e).includes('canceled')) return
       addToast(t('common.error'), 'error')
     }
   }

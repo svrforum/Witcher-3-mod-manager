@@ -26,7 +26,7 @@ export default function ModCard({ mod, onToggle, onContextMenu }: ModCardProps):
     opacity: isDragging ? 0.5 : 1,
   }
 
-  const hasConflicts = mod.modifiedScripts.length > 0
+  const hasConflicts = false
 
   return (
     <div

@@ -103,7 +103,7 @@ export default function ModSearchResults({
               <span>{t('search.endorsements')}: {formatCount(mod.endorsements)}</span>
             </div>
             <button
-              onClick={() => onOpenMod(mod.mod_id)}
+              onClick={(e) => { e.stopPropagation(); onOpenMod(mod.mod_id) }}
               className="px-3 py-1 text-xs bg-witcher-gold/90 hover:bg-witcher-gold text-witcher-bg
                          font-medium rounded transition-colors"
             >

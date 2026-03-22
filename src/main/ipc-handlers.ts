@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow, dialog, shell, app } from 'electron'
-import { existsSync, mkdirSync } from 'fs'
+import { existsSync, mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { detectGame, detectGameVersion } from './modules/game-detector'
 import type { GameInfo } from './modules/game-detector'
@@ -99,7 +99,11 @@ export function registerIpcHandlers(_mainWindow: BrowserWindow): void {
 
   ipcMain.handle('config:save', async (_event, config: AppConfig): Promise<{ success: boolean; error?: string }> => {
     try {
+      const oldConfig = loadConfig()
       saveConfig(config)
+      if (oldConfig.gamePath !== config.gamePath) {
+        modDb = null
+      }
       return { success: true }
     } catch (e) {
       return { success: false, error: String(e) }
@@ -226,9 +230,10 @@ export function registerIpcHandlers(_mainWindow: BrowserWindow): void {
           const orderIdx = orderedIds.indexOf(mod.id)
           if (orderIdx === -1) return mod
 
-          const baseName = mod.id.replace(/^mod\d{4}_/, '').replace(/^mod/, '')
+          const stripped = mod.id.startsWith('~') ? mod.id.slice(1) : mod.id
+          const baseName = stripped.replace(/^mod\d{4}_/, '').replace(/^mod/, '')
           const prefix = String(orderIdx).padStart(4, '0')
-          const newId = `mod${prefix}_${baseName}`
+          const newId = `${mod.id.startsWith('~') ? '~' : ''}mod${prefix}_${baseName}`
 
           return { ...mod, id: newId, name: newId, loadOrder: orderIdx }
         })
@@ -326,6 +331,21 @@ export function registerIpcHandlers(_mainWindow: BrowserWindow): void {
             }
           }
 
+          // Write merged content to disk
+          if (allSuccess && currentMerged) {
+            const mergedDir = join(
+              config.gamePath,
+              'Mods',
+              'mod0000_MergedFiles',
+              'content',
+              'scripts'
+            )
+            const outputPath = join(mergedDir, conflict.scriptPath)
+            const outputDir = join(outputPath, '..')
+            if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true })
+            writeFileSync(outputPath, currentMerged, 'utf-8')
+          }
+
           results.push({
             ...conflict,
             status: allSuccess ? 'auto_merged' : 'unresolved',
@@ -383,6 +403,15 @@ export function registerIpcHandlers(_mainWindow: BrowserWindow): void {
   )
 
   // ─── Shell Handlers ──────────────────────────────────────────────────────
+
+  ipcMain.handle('shell:open-path', async (_event, folderPath: string) => {
+    try {
+      await shell.openPath(folderPath)
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: String(e) }
+    }
+  })
 
   ipcMain.handle('shell:open-logs', async () => {
     const logsDir = join(app.getPath('userData'), 'logs')

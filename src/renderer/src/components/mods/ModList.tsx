@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable'
 import { useModStore } from '../../stores/mod-store'
 import type { InstalledMod } from '../../stores/mod-store'
+import { useAppStore } from '../../stores/app-store'
 import { useIpc } from '../../hooks/use-ipc'
 import { useToastStore } from '../layout/Toast'
 import ModCard from './ModCard'
@@ -36,6 +37,7 @@ export default function ModList(): JSX.Element {
   const setMods = useModStore((s) => s.setMods)
   const isOperating = useModStore((s) => s.isOperating)
   const setOperating = useModStore((s) => s.setOperating)
+  const gamePath = useAppStore((s) => s.config?.gamePath)
   const addToast = useToastStore((s) => s.addToast)
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
 
@@ -94,9 +96,10 @@ export default function ModList(): JSX.Element {
   }
 
   function handleOpenFolder(id: string): void {
-    // Use shell.openPath via IPC or just log for now
-    // This would need a dedicated IPC handler; skip for now
-    console.log('Open folder for mod:', id)
+    if (!gamePath) return
+    invoke('shell:open-path', `${gamePath}/Mods/${id}`).catch((e) => {
+      addToast(String(e), 'error')
+    })
   }
 
   function handleOpenNexus(url: string): void {

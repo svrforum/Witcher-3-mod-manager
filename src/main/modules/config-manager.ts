@@ -34,10 +34,6 @@ export function loadConfig(): AppConfig {
 }
 
 export function saveConfig(config: AppConfig): void {
-  try {
-    if (!existsSync(CONFIG_DIR)) mkdirSync(CONFIG_DIR, { recursive: true })
-    writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2))
-  } catch (e) {
-    logger.error('config', 'Failed to save config', { error: String(e) })
-  }
+  if (!existsSync(CONFIG_DIR)) mkdirSync(CONFIG_DIR, { recursive: true })
+  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2))
 }

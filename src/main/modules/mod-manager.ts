@@ -121,22 +121,24 @@ function stripPrefix(folderName: string): string {
 
 export function applyLoadOrder(modsDir: string, order: string[]): void {
   // Pass 1: rename all to temp names to avoid collisions
-  const tempMap: Array<{ tempName: string; baseName: string }> = []
+  const tempMap: Array<{ tempName: string; baseName: string; disabledPrefix: string }> = []
 
   for (const folderName of order) {
     const src = join(modsDir, folderName)
     if (!existsSync(src)) continue
-    const baseName = stripPrefix(folderName)
+    const disabledPrefix = folderName.startsWith('~') ? '~' : ''
+    const stripped = disabledPrefix ? folderName.slice(1) : folderName
+    const baseName = stripPrefix(stripped)
     const tempName = `__temp_reorder_${baseName}`
     renameSync(src, join(modsDir, tempName))
-    tempMap.push({ tempName, baseName })
+    tempMap.push({ tempName, baseName, disabledPrefix })
   }
 
   // Pass 2: rename from temp to final with numeric prefix
   for (let i = 0; i < tempMap.length; i++) {
-    const { tempName, baseName } = tempMap[i]
+    const { tempName, baseName, disabledPrefix } = tempMap[i]
     const prefix = String(i).padStart(4, '0')
-    const finalName = `mod${prefix}_${baseName}`
+    const finalName = `${disabledPrefix}mod${prefix}_${baseName}`
     renameSync(join(modsDir, tempName), join(modsDir, finalName))
   }
 }
