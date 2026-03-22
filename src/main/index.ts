@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
 import { registerIpcHandlers } from './ipc-handlers'
 
 function createWindow(): void {
@@ -39,6 +40,7 @@ function createWindow(): void {
 
 app.whenReady().then(() => {
   createWindow()
+  autoUpdater.checkForUpdatesAndNotify()
 })
 
 app.on('window-all-closed', () => {
