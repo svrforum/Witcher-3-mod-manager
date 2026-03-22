@@ -1,0 +1,20 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-witcher-bg: #0f0f0f;
+  --color-witcher-surface: #1a1a1a;
+  --color-witcher-card: #242424;
+  --color-witcher-gold: #c4a135;
+  --color-witcher-gold-light: #d4b545;
+  --color-witcher-gold-dark: #a38225;
+  --color-witcher-red: #8b2020;
+  --color-witcher-red-light: #a83030;
+  --color-witcher-text: #e8e8e8;
+  --color-witcher-text-muted: #888888;
+  --color-witcher-border: #333333;
+  --font-sans: 'Pretendard', 'Inter', sans-serif;
+}
+
+body {
+  @apply bg-witcher-bg text-witcher-text font-sans m-0 overflow-hidden select-none;
+}
