@@ -33,6 +33,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish release with notes
-        run: gh release edit ${{ github.ref_name }} --draft=false --generate-notes
+        shell: bash
+        run: |
+          gh api repos/${{ github.repository }}/releases/generate-notes \
+            -f tag_name=${{ github.ref_name }} \
+            --jq '.body' > release_notes.md
+          gh release edit ${{ github.ref_name }} --draft=false --notes-file release_notes.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
