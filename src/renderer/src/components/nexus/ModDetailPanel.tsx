@@ -29,67 +29,68 @@ export default function ModDetailPanel({
   if (!mod && !isLoading) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-witcher-card border border-witcher-border rounded-lg w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className="glass-card rounded-2xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-witcher-border">
+        <div className="flex items-center justify-between p-5 border-b border-witcher-border/30">
           <h2 className="text-lg font-semibold text-witcher-text truncate">
             {isLoading ? t('common.loading') : mod?.name}
           </h2>
           <button
             onClick={onClose}
-            className="text-witcher-text-muted hover:text-witcher-text text-xl leading-none px-1"
+            className="text-witcher-text-muted/40 hover:text-witcher-text text-lg leading-none p-1.5 rounded-lg hover:bg-white/5 transition-smooth"
           >
-            x
+            &#x2715;
           </button>
         </div>
 
         {/* Body */}
         {isLoading ? (
-          <div className="p-6 text-center text-witcher-text-muted text-sm">
-            {t('common.loading')}
+          <div className="p-8 flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-witcher-gold border-t-transparent rounded-full animate-spin" />
+            <span className="text-witcher-text-muted text-sm">{t('common.loading')}</span>
           </div>
         ) : mod ? (
-          <div className="p-4 overflow-auto flex-1">
+          <div className="p-5 overflow-auto flex-1">
             {mod.picture_url && (
               <img
                 src={mod.picture_url}
                 alt={mod.name}
-                className="w-full h-48 object-cover rounded mb-4"
+                className="w-full h-48 object-cover rounded-xl mb-5"
               />
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <span className="text-xs text-witcher-text-muted">Author</span>
-                <p className="text-sm text-witcher-text">{mod.author}</p>
+                <span className="text-[11px] text-witcher-text-muted/60 uppercase tracking-wider">Author</span>
+                <p className="text-sm text-witcher-text mt-0.5">{mod.author}</p>
               </div>
 
               <div>
-                <span className="text-xs text-witcher-text-muted">Version</span>
-                <p className="text-sm text-witcher-text">{mod.version}</p>
+                <span className="text-[11px] text-witcher-text-muted/60 uppercase tracking-wider">Version</span>
+                <p className="text-sm text-witcher-text mt-0.5">{mod.version}</p>
               </div>
 
               <div>
-                <span className="text-xs text-witcher-text-muted">{t('search.endorsements')}</span>
-                <p className="text-sm text-witcher-text">{mod.endorsement_count.toLocaleString()}</p>
+                <span className="text-[11px] text-witcher-text-muted/60 uppercase tracking-wider">{t('search.endorsements')}</span>
+                <p className="text-sm text-witcher-text mt-0.5">{mod.endorsement_count.toLocaleString()}</p>
               </div>
 
               <div>
-                <span className="text-xs text-witcher-text-muted">Summary</span>
-                <p className="text-sm text-witcher-text">{mod.summary}</p>
+                <span className="text-[11px] text-witcher-text-muted/60 uppercase tracking-wider">Summary</span>
+                <p className="text-sm text-witcher-text mt-0.5 leading-relaxed">{mod.summary}</p>
               </div>
             </div>
           </div>
         ) : null}
 
-        {/* Footer */}
+        {/* Footer — bottom-aligned action */}
         {mod && (
-          <div className="p-4 border-t border-witcher-border">
+          <div className="p-5 border-t border-witcher-border/30">
             <button
               onClick={() => onOpenNexus(mod.mod_id)}
-              className="w-full px-4 py-2 bg-witcher-gold text-witcher-bg text-sm font-semibold
-                         rounded hover:bg-witcher-gold-light transition-colors"
+              className="w-full px-4 py-3 bg-witcher-gold text-witcher-bg text-sm font-semibold
+                         rounded-xl hover:bg-witcher-gold-light transition-smooth shadow-lg shadow-witcher-gold/20"
             >
               {t('search.downloadOnNexus')}
             </button>

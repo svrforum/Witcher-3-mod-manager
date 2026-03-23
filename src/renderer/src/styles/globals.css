@@ -12,13 +12,36 @@
   --color-witcher-text: #e8e8e8;
   --color-witcher-text-muted: #888888;
   --color-witcher-border: #333333;
-  --font-sans: 'Pretendard', 'Inter', sans-serif;
+  --font-sans: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
   @apply bg-witcher-bg text-witcher-text font-sans m-0 overflow-hidden select-none;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Scrollbar styling — thin, dark */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Slide-in from right */
 @keyframes slide-in {
   from {
     opacity: 0;
@@ -32,4 +55,109 @@ body {
 
 .animate-slide-in {
   animation: slide-in 0.25s ease-out;
+}
+
+/* Slide-in from top */
+@keyframes slide-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-top {
+  animation: slide-in-top 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out;
+}
+
+/* Page transition */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Expand collapse */
+@keyframes expand {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+.animate-expand {
+  animation: expand 0.3s ease-out;
+  overflow: hidden;
+}
+
+/* Skeleton loading pulse */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.15; }
+}
+
+.skeleton {
+  background: #333;
+  border-radius: 8px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* Glassmorphism card variant */
+.glass-card {
+  background: rgba(36, 36, 36, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Smooth transition utilities */
+.transition-smooth {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.transition-colors-smooth {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Focus ring */
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #c4a135;
+  box-shadow: 0 0 0 3px rgba(196, 161, 53, 0.1);
 }

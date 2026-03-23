@@ -18,7 +18,9 @@ export default function MainContent(): JSX.Element {
 
   return (
     <main className="flex-1 bg-witcher-bg overflow-auto">
-      {pages[currentPage] ?? <ModList />}
+      <div key={currentPage} className="animate-page-enter h-full">
+        {pages[currentPage] ?? <ModList />}
+      </div>
     </main>
   )
 }

@@ -10,10 +10,11 @@ export default function ModInstallDialog({ visible }: ModInstallDialogProps): JS
   if (!visible) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-40">
-      <div className="bg-witcher-surface border border-witcher-border rounded-lg px-8 py-6 flex flex-col items-center gap-3 shadow-2xl">
-        <div className="w-8 h-8 border-2 border-witcher-gold border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-witcher-text">{t('common.loading')}</p>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-40 animate-fade-in">
+      <div className="glass-card rounded-2xl px-10 py-8 flex flex-col items-center gap-4 shadow-2xl">
+        <div className="w-10 h-10 border-2 border-witcher-gold border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-witcher-text font-medium">{t('common.loading')}</p>
+        <p className="text-xs text-witcher-text-muted/60">Installing mod...</p>
       </div>
     </div>
   )

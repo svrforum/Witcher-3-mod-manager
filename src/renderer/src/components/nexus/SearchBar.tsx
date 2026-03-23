@@ -17,22 +17,22 @@ export default function SearchBar({ onSearch, isLoading }: SearchBarProps): JSX.
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="flex gap-3">
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t('search.placeholder')}
-        className="flex-1 bg-witcher-surface border border-witcher-border rounded px-4 py-2.5
-                   text-sm text-witcher-text placeholder:text-witcher-text-muted/50
-                   focus:border-witcher-gold focus:outline-none transition-colors"
+        className="flex-1 bg-witcher-card/50 border border-witcher-border/50 rounded-xl px-4 py-3
+                   text-sm text-witcher-text placeholder:text-witcher-text-muted/40
+                   transition-smooth"
       />
       <button
         type="submit"
         disabled={isLoading || !query.trim()}
-        className="px-6 py-2.5 bg-witcher-gold text-witcher-bg text-sm font-semibold rounded
-                   hover:bg-witcher-gold-light transition-colors
-                   disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-6 py-3 bg-witcher-gold text-witcher-bg text-sm font-semibold rounded-xl
+                   hover:bg-witcher-gold-light transition-smooth
+                   disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-witcher-gold/20"
       >
         {isLoading ? t('common.loading') : t('search.title')}
       </button>

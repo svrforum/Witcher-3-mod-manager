@@ -44,30 +44,33 @@ export default function ModContextMenu({
 
   const items = [
     {
-      label: t('mods.delete'),
-      action: () => onDelete(mod.id),
-      className: 'text-red-400 hover:text-red-300 hover:bg-red-900/30',
-    },
-    {
       label: t('mods.openFolder'),
+      icon: '\uD83D\uDCC2',
       action: () => onOpenFolder(mod.id),
-      className: 'text-witcher-text hover:text-witcher-gold hover:bg-witcher-card',
+      className: 'text-witcher-text hover:text-witcher-gold hover:bg-white/5',
     },
     ...(mod.nexusUrl
       ? [
           {
             label: t('mods.openNexus'),
+            icon: '\uD83C\uDF10',
             action: () => onOpenNexus(mod.nexusUrl!),
-            className: 'text-witcher-text hover:text-witcher-gold hover:bg-witcher-card',
+            className: 'text-witcher-text hover:text-witcher-gold hover:bg-white/5',
           },
         ]
       : []),
+    {
+      label: t('mods.delete'),
+      icon: '\uD83D\uDDD1',
+      action: () => onDelete(mod.id),
+      className: 'text-red-400 hover:text-red-300 hover:bg-red-900/20',
+    },
   ]
 
   return (
     <div
       ref={menuRef}
-      className="fixed z-50 bg-witcher-surface border border-witcher-border rounded shadow-xl py-1 min-w-40"
+      className="fixed z-50 glass-card rounded-xl shadow-2xl py-1.5 min-w-44 animate-fade-in"
       style={{ left: x, top: y }}
     >
       {items.map((item, i) => (
@@ -77,8 +80,9 @@ export default function ModContextMenu({
             item.action()
             onClose()
           }}
-          className={`block w-full text-left px-3 py-1.5 text-sm transition-colors ${item.className}`}
+          className={`flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-sm transition-colors-smooth ${item.className}`}
         >
+          <span className="text-xs">{item.icon}</span>
           {item.label}
         </button>
       ))}
