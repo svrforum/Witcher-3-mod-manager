@@ -7,6 +7,10 @@ files:
   - '!src/*'
   - '!tests/*'
   - '!docs/*'
+asarUnpack:
+  - 'node_modules/7zip-bin/**/*'
+  - 'node_modules/7zip-min/**/*'
+  - 'node_modules/node-unrar-js/**/*'
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true

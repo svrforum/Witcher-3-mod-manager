@@ -24,9 +24,12 @@ export async function extractArchive(archivePath: string, destDir: string): Prom
       throw new Error('Failed to extract RAR archive — no files found')
     }
   } else if (ext === '.7z') {
-    const sevenZip = require('7zip-min')
+    const { execFile } = require('child_process')
+    // Get 7za binary path from 7zip-bin, fix asar path for packaged app
+    let bin7z: string = require('7zip-bin').path7za
+    bin7z = bin7z.replace('app.asar', 'app.asar.unpacked')
     await new Promise<void>((resolve, reject) => {
-      sevenZip.unpack(archivePath, destDir, (err: Error | null) => {
+      execFile(bin7z, ['x', archivePath, `-o${destDir}`, '-y'], (err: Error | null) => {
         if (err) reject(new Error(`Failed to extract .7z: ${err.message}`))
         else resolve()
       })
