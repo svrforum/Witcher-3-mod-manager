@@ -16,7 +16,7 @@ function getLogger() {
 
 // GitHub raw URL for remote preset updates
 const REMOTE_PRESETS_URL =
-  'https://raw.githubusercontent.com/svrforum/SF-Witcher-3-mod-tool/master/resources/presets/default-presets.json'
+  'https://raw.githubusercontent.com/svrforum/Witcher-3-mod-manager/master/resources/presets/default-presets.json'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

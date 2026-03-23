@@ -20,4 +20,4 @@ win:
 publish:
   provider: github
   owner: svrforum
-  repo: SF-Witcher-3-mod-tool
+  repo: Witcher-3-mod-manager
